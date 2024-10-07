@@ -2,61 +2,67 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
-const ejs = require('ejs');
 
 const webserver = express();
 
 webserver.use(express.urlencoded({ extended: true }));
-webserver.set('view engine', 'ejs');
 
 const port = 7380;
 let variants = [];
 let statistics = [];
 
-const divOpen = '<div>';
-const divClose = '</div>';
-const inputStart = '<input type="radio" name="vote" id="vote_check';
-const inputFinish = ' />';
-const inputValue = ' value="';
-const labelOpen = '<label for="vote_check';
-const labelClose = '.text %></label>';
-const withStatLabelClose = ' %></label>';
-const nameFile = path.join(__dirname, 'index.html');
-const startHtml =
-  '<!DOCTYPE html><html><body><fieldset><legend>Где Вы хотите провести Новый год?</legend><form method = "get" action="http://178.172.195.18:7380/variants"><button type="submit">Варианты</button></form><form method="post" action="http://178.172.195.18:7380/stat"><button type="submit">Статистика</button></form><form method="post" name="vote" action="http://178.172.195.18:7380/vote">';
-const endHtmlWithBtn =
-  '<button type="submit">Проголосовать</button></form></fieldset></body></html>';
-function variantsList(arr) {
-  let html = '';
-  arr.forEach((elem, idx) => {
-    let input = `${elem.code}"`;
-    let label = `${elem.code}"><%= variants[${idx}]`;
-    html = `${html}${divOpen}${inputStart}${input}${inputValue}${input}${inputFinish}${labelOpen}${label}${labelClose}${divClose}`;
-  });
-  return html;
+const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>    
+</head>
+<body>
+<form method="post" action="/vote">
+<fieldset>
+  <legend>Где Вы хотите провести Новый год?</legend>
+  <input type="radio" name="vote" id="vote0" value="0"></input>
+  <label for="vote0" id="label0"></label><br />
+  <input type="radio" name="vote" id="vote1" value="1"></input>
+  <label for="vote1" id="label1"></label><br />
+  <input type="radio" name="vote" id="vote2" value="2"></input>
+  <label for="vote2" id="label2"></label><br />
+  <input type="radio" name="vote id="vote3" value="3"></input>
+  <label for="vote3" id="label3"></label><br />  
+  <button type="submit">Проголосовать</button>
+  </form>
+</fieldset>
+<script>
+getVariants();
+getStat();
+async function getVariants() {
+  const response = await fetch('/variants');
+  const variants = await response.json();
+  document.getElementById('label0').innerText = variants[0].text;
+  document.getElementById('label1').innerText = variants[1].text;
+  document.getElementById('label2').innerText = variants[2].text;
+  document.getElementById('label3').innerText = variants[3].text;
 }
-function variantsAndStatList(vars, stat) {
-  const varsAndStat = vars.map((e, i) => ({ ...e, ...stat[i] }));
-  let html = '';
-  varsAndStat.forEach((elem, idx) => {
-    let input = `${elem.code}"`;
-    let label = `${elem.code}"><%= variants[${idx}].text %> - <%= statistics[${idx}].count`;
-    html = `${html}${divOpen}${inputStart}${input}${inputValue}${input}${inputFinish}${labelOpen}${label}${withStatLabelClose}${divClose}`;
-  });
-  return html;
+async function getStat() {
+const response = await fetch('/stat', {method: 'post'});
+const statistics = await response.json()
+ document.getElementById('label0').innerText += ' - ' + statistics[0].count;
+ document.getElementById('label1').innerText += ' - ' + statistics[1].count;
+ document.getElementById('label2').innerText += ' - ' + statistics[2].count;
+ document.getElementById('label3').innerText += ' - ' + statistics[3].count;
 }
+</script>
+</body>
+</html>
+`;
 
 webserver.get('/variants', (req, res) => {
   const variants_data = fs.readFileSync(path.join(__dirname, 'variants.json'));
   variants = JSON.parse(variants_data);
-  let variantsHtml = variantsList(variants);
-  variantsHtml = `${startHtml}${variantsHtml}${endHtmlWithBtn}`;
-  const fd = fs.openSync(nameFile, 'w');
-  fs.ftruncateSync(fd, 0);
-  fs.writeSync(fd, variantsHtml + os.EOL);
-  fs.closeSync(fd);
-  var template = fs.readFileSync(nameFile, 'utf8');
-  res.send(ejs.render(template, { statistics, variants }));
+  res.send(variants);
 });
 
 webserver.post('/stat', (req, res) => {
@@ -64,14 +70,7 @@ webserver.post('/stat', (req, res) => {
     path.join(__dirname, 'statistics.json')
   );
   statistics = JSON.parse(statistics_data);
-  let variantsStatHtml = variantsAndStatList(variants, statistics);
-  variantsStatHtml = `${startHtml}${variantsStatHtml}${endHtmlWithBtn}`;
-  const fd = fs.openSync(nameFile, 'w');
-  fs.ftruncateSync(fd, 0);
-  fs.writeSync(fd, variantsStatHtml + os.EOL);
-  fs.closeSync(fd);
-  var template = fs.readFileSync(nameFile, 'utf8');
-  res.send(ejs.render(template, { statistics, variants }));
+  res.send(statistics);
 });
 
 webserver.post('/vote', (req, res) => {
@@ -87,21 +86,11 @@ webserver.post('/vote', (req, res) => {
   fs.ftruncateSync(fd, 0);
   fs.writeSync(fd, JSON.stringify(newStat) + os.EOL);
   fs.closeSync(fd);
-  let variants_data = fs.readFileSync(path.join(__dirname, 'variants.json'));
-  variants = JSON.parse(variants_data);
-  var template = fs.readFileSync(nameFile, 'utf8');
-  res.send(ejs.render(template, { statistics, variants }));
+  res.send(html);
 });
 
 webserver.get('/voting', (req, res) => {
-  let variantsHtml = variantsList(variants);
-  variantsHtml = `${startHtml}${variantsHtml}${endHtmlWithBtn}`;
-  const fd = fs.openSync(nameFile, 'w');
-  fs.ftruncateSync(fd, 0);
-  fs.writeSync(fd, variantsHtml + os.EOL);
-  fs.closeSync(fd);
-  var template = fs.readFileSync(nameFile, 'utf8');
-  res.send(ejs.render(template, { statistics, variants }));
+  res.send(html);
 });
 
 webserver.listen(port, () => {

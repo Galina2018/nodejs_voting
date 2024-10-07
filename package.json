@@ -1,11 +1,12 @@
 {
-    "name": "homework1",
-    "version": "0.0.1",
-    "description": "Node.js web projects architecture v2",
-    "scripts": {},
-    "dependencies": {
-        "express": "^4.21.0",
-        "nodemon": "^3.1.7", 
-        "ejs": "^3.1.9" 
-    }
+  "name": "homework1",
+  "version": "0.0.1",
+  "description": "Node.js web projects architecture v2",
+  "main": "index.html",
+  "scripts": {},
+  "dependencies": {
+    "express": "^4.21.0",
+    "nodemon": "^2.0.20",
+    "ejs": "^3.1.9"
+  }
 }
