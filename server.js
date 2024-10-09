@@ -8,74 +8,22 @@ const webserver = express();
 webserver.use(express.urlencoded({ extended: true }));
 
 const port = 7380;
-let variants = [];
 let statistics = [];
-
-const html = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title> 
-<script>
-getVariants();
-getStat();
-
-async function getVariants() {
-  const response = await fetch('/variants');
-  const variants = await response.json();
-  document.getElementById('label0').innerText = variants[0].text;
-  document.getElementById('label1').innerText = variants[1].text;
-  document.getElementById('label2').innerText = variants[2].text;
-  document.getElementById('label3').innerText = variants[3].text;
-}
-async function getStat() {
-const response = await fetch('/stat', {method: 'post'});
-const statistics = await response.json();
- document.getElementById('stat0').innerText = ' - ' + statistics[0].count;
- document.getElementById('stat1').innerText = ' - ' + statistics[1].count;
- document.getElementById('stat2').innerText = ' - ' + statistics[2].count;
- document.getElementById('stat3').innerText = ' - ' + statistics[3].count;
-}
-</script>   
-</head>
-<body>
-<form method="post" action="/vote">
-<fieldset>
-  <legend>Где Вы хотите провести Новый год?</legend>
-  <input type="radio" name="vote" id="vote0" value="0"></input>
-  <label for="vote0" id="label0"></label><span id="stat0"></span><br />
-  <input type="radio" name="vote" id="vote1" value="1"></input>
-  <label for="vote1" id="label1"></label><span id="stat1"></span><br />
-  <input type="radio" name="vote" id="vote2" value="2"></input>
-  <label for="vote2" id="label2"></label><span id="stat2"></span><br />
-  <input type="radio" name="vote id="vote3" value="3"></input>
-  <label for="vote3" id="label3"></label><span id="stat3"></span><br />  
-  <button type="submit">Проголосовать</button>
-  </form>
-</fieldset>
-
-</body>
-</html>
-`;
 
 webserver.get('/variants', (req, res) => {
   const variants_data = fs.readFileSync(path.join(__dirname, 'variants.json'));
-  variants = JSON.parse(variants_data);
-  res.send(variants);
+  res.send(variants_data);
 });
 
 webserver.post('/stat', (req, res) => {
   let statistics_data = fs.readFileSync(
     path.join(__dirname, 'statistics.json')
   );
-  statistics = JSON.parse(statistics_data);
-  res.send(statistics);
+  res.send(statistics_data);
 });
 
 webserver.post('/vote', (req, res) => {
+  console.log('post vote');
   let statistics_data = fs.readFileSync(
     path.join(__dirname, 'statistics.json')
   );
@@ -88,10 +36,11 @@ webserver.post('/vote', (req, res) => {
   fs.ftruncateSync(fd, 0);
   fs.writeSync(fd, JSON.stringify(newStat) + os.EOL);
   fs.closeSync(fd);
-  res.send(html);
 });
 
-webserver.get('/voting', (req, res) => {
+webserver.get('/', (req, res) => {
+  console.log('get page');
+  const html = fs.readFileSync(path.join(__dirname, 'page.html'), 'utf8');
   res.send(html);
 });
 

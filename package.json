@@ -5,8 +5,9 @@
   "main": "index.html",
   "scripts": {},
   "dependencies": {
-    "express": "^4.21.0",
-    "nodemon": "^2.0.20",
-    "ejs": "^3.1.9"
+    "express": "^4.21.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
   }
 }
