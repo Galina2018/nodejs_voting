@@ -7,7 +7,7 @@
     <title>Document</title>    
 </head>
 <body>
-  <form method="post" action="/vote">
+  <form id="form">
     <fieldset>
       <legend>Где Вы хотите провести Новый год?</legend>
       <input type="radio" name="vote" id="vote0" value="0"></input>
@@ -21,39 +21,7 @@
       <button type="submit">Проголосовать</button>     
     </fieldset>
   </form>
+  <script type="text/javascript" src="script.js"></script>
 </body>
-<script> 
-getVariants();
-getStat(); 
-const form = document.getElementById('form')
-form.addEventListener('submit', test)
-
-function test(event) {
-  event.preventDefault();
-  console.log(222222)  
-  fetch('/vote', {
-    method: 'POST',
-    body: new FormData(form)
-  })
-  getStat();
-}
-
-async function getVariants() {
-  const response = await fetch('/variants');
-  const variants = await response.json();
-  document.getElementById('label0').innerText = variants[0].text;
-  document.getElementById('label1').innerText = variants[1].text;
-  document.getElementById('label2').innerText = variants[2].text;
-  document.getElementById('label3').innerText = variants[3].text;
-}
-async function getStat() {
-const response = await fetch('/stat', {method: 'post'});
-const statistics = await response.json()
- document.getElementById('label0').innerText += ' - ' + statistics[0].count;
- document.getElementById('label1').innerText += ' - ' + statistics[1].count;
- document.getElementById('label2').innerText += ' - ' + statistics[2].count;
- document.getElementById('label3').innerText += ' - ' + statistics[3].count;
-}
-</script>
 </body>
 </html>

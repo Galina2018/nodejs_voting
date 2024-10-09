@@ -2,13 +2,14 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
+const multer = require('multer');
 
 const webserver = express();
+const upload = multer();
 
 webserver.use(express.urlencoded({ extended: true }));
-
+webserver.use(express.static('public'));
 const port = 7380;
-let statistics = [];
 
 webserver.get('/variants', (req, res) => {
   const variants_data = fs.readFileSync(path.join(__dirname, 'variants.json'));
@@ -22,8 +23,7 @@ webserver.post('/stat', (req, res) => {
   res.send(statistics_data);
 });
 
-webserver.post('/vote', (req, res) => {
-  console.log('post vote');
+webserver.post('/vote', upload.none(), (req, res) => {
   let statistics_data = fs.readFileSync(
     path.join(__dirname, 'statistics.json')
   );
@@ -39,7 +39,6 @@ webserver.post('/vote', (req, res) => {
 });
 
 webserver.get('/', (req, res) => {
-  console.log('get page');
   const html = fs.readFileSync(path.join(__dirname, 'page.html'), 'utf8');
   res.send(html);
 });
@@ -47,3 +46,4 @@ webserver.get('/', (req, res) => {
 webserver.listen(port, () => {
   console.log('webserver running on port ' + port);
 });
+
