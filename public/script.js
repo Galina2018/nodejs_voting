@@ -25,3 +25,30 @@ async function getStat() {
   document.getElementById('stat2').innerText = ' - ' + statistics[2].count;
   document.getElementById('stat3').innerText = ' - ' + statistics[3].count;
 }
+async function resXml() {
+  const response = await fetch('/stat', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/xml',
+    },
+  });
+  console.log('Статистика получена виде XML ', await response.text());
+}
+async function resHtml() {
+  const response = await fetch('/stat', {
+    method: 'POST',
+    headers: {
+      Accept: 'text/html',
+    },
+  });
+  console.log('Статистика получена виде HTML ', await response.text());
+}
+async function resJson() {
+  const response = await fetch('/stat', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+    },
+  });
+  console.log('Статистика получена в виде JSON ', await response.json());
+}
