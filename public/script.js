@@ -41,7 +41,9 @@ async function resHtml() {
       Accept: 'text/html',
     },
   });
-  console.log('Статистика получена виде HTML ', await response.text());
+  const tbl = await response.text();
+  console.log('Статистика получена виде HTML ', tbl);
+  document.getElementById('table').innerHTML = tbl;
 }
 async function resJson() {
   const response = await fetch('/stat', {
