@@ -62,6 +62,7 @@ webserver.post('/stat', (req, res) => {
     }
     result += '</table>';
     res.setHeader('Content-type', 'text/html');
+    res.setHeader('Content-Disposition', 'attachment');
     res.send(result);
   } else if (req.headers.accept === 'application/xml') {
     let result = '<Statistics>';
@@ -74,6 +75,7 @@ webserver.post('/stat', (req, res) => {
     }
     result += '</Statistics>';
     res.setHeader('Content-type', 'application/xml');
+    res.setHeader('Content-Disposition', 'attachment');
     res.send(result);
   } else if (req.headers.accept === 'application/json') res.send(statistics);
   else res.send(statistics);
