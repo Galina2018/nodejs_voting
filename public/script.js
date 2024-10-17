@@ -32,7 +32,11 @@ async function resXml() {
       Accept: 'application/xml',
     },
   });
-  console.log('Статистика получена виде XML ', await response.text());
+  const data = await response.blob();
+  const btn = document.createElement('a');
+  btn.href = window.URL.createObjectURL(new Blob([data]));
+  btn.download = 'result.xml';
+  btn.click();
 }
 async function resHtml() {
   const response = await fetch('/stat', {
@@ -41,9 +45,11 @@ async function resHtml() {
       Accept: 'text/html',
     },
   });
-  const tbl = await response.text();
-  console.log('Статистика получена виде HTML ', tbl);
-  document.getElementById('table').innerHTML = tbl;
+  const data = await response.blob();
+  const btn = document.createElement('a');
+  btn.href = window.URL.createObjectURL(new Blob([data]));
+  btn.download = 'result.html';
+  btn.click();
 }
 async function resJson() {
   const response = await fetch('/stat', {
@@ -52,5 +58,9 @@ async function resJson() {
       Accept: 'application/json',
     },
   });
-  console.log('Статистика получена в виде JSON ', await response.json());
+  const data = await response.blob();
+  const btn = document.createElement('a');
+  btn.href = window.URL.createObjectURL(new Blob([data]));
+  btn.download = 'result.json';
+  btn.click();
 }
